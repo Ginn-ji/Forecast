@@ -37,29 +37,33 @@ useEffect(() => {
   }
 
   trainOnce();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
 }, []);
 
   // ------------------------------
   // GENERATE 100 NEW PRODUCTS
   // ------------------------------
-  const generateProducts = () => {
-    const list = [];
-    for (let i = 1; i <= 100; i++) {
-      list.push({
-        id: i,
-        name: "Product " + i,
-        inventory: Math.floor(Math.random() * 100) + 1,
-        avgSales: Math.floor(Math.random() * 50) + 5,
-        leadTime: Math.floor(Math.random() * 7) + 1,
-      });
+const generateProducts = async () => {
+
+    const API_URL = 'http://127.0.0.1:8000/api/products';
+    
+    try {
+      const response = await fetch(API_URL);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const list = await response.json();
+
+      setProducts(list);
+      setPredictions({});
+      setCanPredict(true); // allow new prediction round
+    } catch (error) {
+      console.error("Error fetching products:", error);
+      alert("Could not fetch products from API. Check the console for details.");
     }
-
-    setProducts(list);
-    setPredictions({});
-    setCanPredict(true); // allow new prediction round
   };
-
+  
   // ------------------------------
   // PREDICT ALL (ONLY ONCE PER LOAD)
   // ------------------------------
